@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Sprout, LogIn, LogOut } from "lucide-react";
+import { Sprout, LogIn, LogOut, Sun, Moon } from "lucide-react";
 import { Link } from "react-router";
 import Button from "../components/ui/Button";
 import Wrapper from "../components/Wrapper";
@@ -14,81 +14,33 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "../config/firebase";
 import {
   collection,
-  addDoc,
   onSnapshot,
-  doc,
-  updateDoc,
-  deleteDoc,
   query,
   orderBy,
   where,
 } from "firebase/firestore";
 
 const Index = () => {
-  const [tasks, setTasks] = useState([
-    // {
-    //   id: "1",
-    //   title: "Plan the week ahead",
-    //   completed: true,
-    //   createdAt: new Date(),
-    // },
-    // {
-    //   id: "2",
-    //   title: "Review project goals",
-    //   completed: false,
-    //   createdAt: new Date(),
-    // },
-    // {
-    //   id: "3",
-    //   title: "Water the plants 🌱",
-    //   completed: false,
-    //   createdAt: new Date(),
-    // },
-  ]);
-
+  const [tasks, setTasks] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!user) return; // Nếu chưa login thì không query
+    if (!user) return;
 
     const q = query(
       collection(db, "todos"),
-      where("uid", "==", user.uid), // Chỉ lấy task của user hiện tại
+      where("uid", "==", user.uid),
       orderBy("timestamp", "desc")
     );
 
+    // tao su kien de lang nghe khi task trong db thay doi
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setTasks(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
   }, [user]);
-
-  const handleAdd = async (value) => {
-    if (value === "" || !user) return;
-    await addDoc(collection(db, "todos"), {
-      title: value,
-      completed: false,
-      timestamp: new Date(),
-      uid: user.uid,
-    });
-
-    toast.success("Your task add successfull");
-  };
-
-  const handleEdit = async (task, value) => {
-    await updateDoc(doc(db, 'todos', task.id), { title: value})
-    toast.success("Your task edit successfull");
-  };
-
-  const handleToggle = async (task) => {
-    await updateDoc(doc(db, "todos", task.id), { completed: !task.completed });
-  };
-
-  const handleDelete = async (id) => {
-    await deleteDoc(doc(db, 'todos', id))
-    toast.info("Your task edit successfull");
-  };
 
   const handleLogOut = async (isLogin) => {
     if (isLogin) {
@@ -98,35 +50,49 @@ const Index = () => {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper darkmode={isDarkMode}>
       <header className="sticky top-0 z-10 backdrop-blur-sm ">
         <div className="max-w-4xl mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="size-12  rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center">
               <Sprout className="size-6 text-primary-foreground" />
             </div>
-            <h1 className="font-display font-semibold text-xl">CatTasks</h1>
+            <h1 className="font-display font-semibold text-xl text-foreground">
+              CatTasks
+            </h1>
           </div>
 
-          <Link
-            to="/login"
-            className="rounded-3xl border-2 py-2 px-6  hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors duration-200"
-            onClick={() => handleLogOut(user !== null)}
-          >
-            <Button className="flex items-center gap-2">
-              {user ? (
-                <>
-                  <LogOut className="size-4" />
-                  Log out
-                </>
+          <div className="flex items-center gap-4">
+            <div
+              onClick={() => setIsDarkMode((prevMode) => !prevMode)}
+              className="p-2 rounded-full border-2 text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent cursor-pointer transition-colors duration-200"
+            >
+              {isDarkMode ? (
+                <Moon className="w-4 h-4" />
               ) : (
-                <>
-                  <LogIn className="size-4" />
-                  Login
-                </>
+                <Sun className="w-4 h-4" />
               )}
-            </Button>
-          </Link>
+            </div>
+            <Link
+              to="/login"
+              className="rounded-3xl border-2 py-2 px-6 text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors duration-200"
+              onClick={() => handleLogOut(user !== null)}
+            >
+              <Button className="flex items-center gap-2">
+                {user ? (
+                  <>
+                    <LogOut className="size-4" />
+                    Log out
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="size-4" />
+                    Login
+                  </>
+                )}
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -150,13 +116,13 @@ const Index = () => {
         </section>
 
         <section className="my-8 animate-fade-in">
-          <AddTask onAdd={handleAdd} />
+          <AddTask />
         </section>
 
         <section>
           <div>
             <div className="flex justify-between mb-4">
-              <p className="font-display font-bold text-xl">Your Tasks</p>
+              <p className="font-display text-foreground font-bold text-xl">Your Tasks</p>
               {tasks.length > 0 && (
                 <span className="text-sm text-muted-foreground">
                   {tasks.filter((t) => !t.completed).length} remaining
@@ -168,13 +134,7 @@ const Index = () => {
             ) : (
               <ul className="">
                 {tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={handleToggle}
-                    onDelete={handleDelete}
-                    onEdit={handleEdit}
-                  />
+                  <TaskItem key={task.id} task={task} />
                 ))}
               </ul>
             )}

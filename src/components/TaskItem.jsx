@@ -1,52 +1,63 @@
 import { Check, SquarePen, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import Input from "./ui/Input";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
+import { toast } from "sonner";
 
-const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
+const TaskItem = ({ task }) => {
   const [editing, setEditing] = useState({ value: task.title, isEdit: false });
   const [isDeleting, setIsDeleting] = useState(false);
   const completed = task.completed
     ? "bg-success border-success"
     : "border-muted-foreground/30 hover:border-primary";
 
-  const handleEnter = (e) => {
+  const handleEnter = async (e) => {
     if (e.key === "Enter") {
-      onEdit(task, editing.value);
+      await updateDoc(doc(db, "todos", task.id), { title: editing.value });
+      toast.success("Your task edit successfull");
       setEditing({ value: task.title, isEdit: false });
     }
   };
 
-  const handleEdit = () => {
+  const toggleCompleted = async (task) => {
+    await updateDoc(doc(db, "todos", task.id), { completed: !task.completed });
+  };
+
+  const toggleEdit = () => {
     setEditing((prevIsEdit) => ({
       ...prevIsEdit,
       isEdit: !prevIsEdit.isEdit,
     }));
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setIsDeleting(true);
-    setTimeout(() => onDelete(task.id), 300);
+    setTimeout(async () => await deleteDoc(doc(db, "todos", task.id)), 300);
+    toast.info("Your task edit successfull");
   };
 
   return (
     <li
       className={`${
         isDeleting && "scale-50 opacity-0"
-      } group flex gap-4 justify-between items-center bg-card border border-border/50 p-5 mb-4 rounded-xl hover:shadow-soft animate-fade-in-up transition duration-300`}
+      } group flex gap-4 justify-between items-center text-foreground bg-card border border-border/50 p-5 mb-4 rounded-xl hover:shadow-soft animate-fade-in-up transition duration-300`}
     >
       {editing.isEdit ? (
         <div className="flex-1">
-            <Input
-              value={editing.value}
-              setValue={(e) => setEditing({ value: e.target.value, isEdit: true })}
-              onEnter={handleEnter}
-              id={"editTask"}
-            />
+          <Input
+            value={editing.value}
+            setValue={(e) =>
+              setEditing({ value: e.target.value, isEdit: true })
+            }
+            onEnter={handleEnter}
+            id={"editTask"}
+          />
         </div>
       ) : (
         <div
           className={`flex gap-4 ${task.completed && "opacity-50"}`}
-          onClick={() => onToggle(task)}
+          onClick={() => toggleCompleted(task)}
         >
           <button
             type="radio"
@@ -67,7 +78,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 text-muted-foreground cursor-pointer transition-all duration-300">
         <div
           className="hover:bg-primary/50 hover:text-primary p-2 rounded-lg"
-          onClick={handleEdit}
+          onClick={toggleEdit}
         >
           <SquarePen className="w-5 h-5" />
         </div>

@@ -30,7 +30,7 @@ function AppContent() {
   return (
     <>
       <Toaster />
-      <BrowserRouter>
+      <BrowserRouter >
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />

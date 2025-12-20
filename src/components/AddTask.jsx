@@ -1,17 +1,31 @@
 import { Plus } from "lucide-react";
 import React, { useState } from "react";
 import Input from "./ui/Input";
+import { addDoc, collection } from "firebase/firestore";
+import { useSelector } from "react-redux";
+import { db } from "../config/firebase";
+import { toast } from "sonner";
 
-const AddTask = ({ onAdd }) => {
+const AddTask = () => {
   const [value, setValue] = useState("");
-
+  const user = useSelector((state) => state.user.value);
   const disable = value.trim()
     ? "bg-primary cursor-pointer hover:bg-primary/80"
     : "bg-primary/50";
 
-  const handleAdd = () => {
-    onAdd(value);
+  const handleAdd = async () => {
+    if (value === "" || !user) {
+      toast.error("please login to add new task");
+      return;
+    }
+    await addDoc(collection(db, "todos"), {
+      title: value,
+      completed: false,
+      timestamp: new Date(),
+      uid: user.uid,
+    });
     setValue("");
+    toast.success("Your task add successfull");
   };
 
   const handleEnter = (e) => {
@@ -23,12 +37,12 @@ const AddTask = ({ onAdd }) => {
   return (
     <div className="flex gap-3">
       <div className="flex-1">
-        <Input 
+        <Input
           value={value}
           setValue={(e) => setValue(e.target.value)}
           placeholder="What need to be done?"
           onEnter={handleEnter}
-          id={'addTask'}
+          id={"addTask"}
         />
       </div>
       <button

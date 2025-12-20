@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, CloudCog, ListTodo } from "lucide-react";
+import { CheckCircle2, Circle, ListTodo } from "lucide-react";
 import ProgressBar from "./ui/ProgressBar";
 
 const TaskStats = ({ tasks }) => {

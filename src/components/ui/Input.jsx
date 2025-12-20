@@ -11,7 +11,7 @@ const Input = ({
   ...props
 }) => {
   let css =
-    "w-full h-full border px-4 py-2 ring-offset-background text-base bg-card border-input rounded-xl focus:border-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none ";
+    "w-full h-full border px-4 py-2 ring-offset-background text-foreground bg-card border-input rounded-xl placeholder:text-muted-foreground focus:border-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none ";
   if (className) css += className;
   return (
     <>
