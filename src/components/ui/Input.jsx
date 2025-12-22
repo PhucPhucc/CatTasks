@@ -15,7 +15,7 @@ const Input = ({
   if (className) css += className;
   return (
     <>
-      {label && <label htmlFor={id} className="font-semibold font-display text-sm pb-2 inline-block">{label}</label>}
+      {label && <label htmlFor={id} className="font-semibold font-display text-foreground text-sm pb-2 inline-block">{label}</label>}
       <div className="relative h-full">
         {icon && (
           <div className="absolute top-1/2 left-6 -translate-1/2 text-muted-foreground">

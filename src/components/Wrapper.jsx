@@ -1,7 +1,11 @@
 import React from "react";
 
-const Wrapper = ({ darkmode, children }) => {
-  if (darkmode) {
+const Wrapper = ({ children }) => {
+  const mode = localStorage.getItem("darkmode")
+      ? JSON.parse(localStorage.getItem("darkmode"))
+      : false;
+
+  if (mode) {
     return <DarkMode>{children}</DarkMode>;
   }
   return <LightMode>{children}</LightMode>;

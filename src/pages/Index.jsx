@@ -22,7 +22,7 @@ import {
 
 const Index = () => {
   const [tasks, setTasks] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(JSON.parse(localStorage.getItem('darkmode')));
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
 
@@ -49,8 +49,15 @@ const Index = () => {
       toast.info("You log out success");
     }
   };
+
+  const toggleDarkMode = () => {
+    JSON.stringify(localStorage.setItem("darkmode", !isDarkMode));
+
+    setIsDarkMode((prevMode) => !prevMode);
+  };
+
   return (
-    <Wrapper darkmode={isDarkMode}>
+    <Wrapper>
       <header className="sticky top-0 z-10 backdrop-blur-sm ">
         <div className="max-w-4xl mx-auto py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -64,7 +71,7 @@ const Index = () => {
 
           <div className="flex items-center gap-4">
             <div
-              onClick={() => setIsDarkMode((prevMode) => !prevMode)}
+              onClick={toggleDarkMode}
               className="p-2 rounded-full border-2 text-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent cursor-pointer transition-colors duration-200"
             >
               {isDarkMode ? (
@@ -122,7 +129,9 @@ const Index = () => {
         <section>
           <div>
             <div className="flex justify-between mb-4">
-              <p className="font-display text-foreground font-bold text-xl">Your Tasks</p>
+              <p className="font-display text-foreground font-bold text-xl">
+                Your Tasks
+              </p>
               {tasks.length > 0 && (
                 <span className="text-sm text-muted-foreground">
                   {tasks.filter((t) => !t.completed).length} remaining

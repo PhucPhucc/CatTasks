@@ -59,8 +59,8 @@ const Register = () => {
             <Sprout className="w-10 h-10 text-primary-foreground" />
           </div>
 
-          <div className="text-center font-display">
-            <p className="font-semibold text-foreground text-2xl mt-4 mb-2">
+          <div className="text-center font-display text-foreground">
+            <p className="font-semibold text-2xl mt-4 mb-2">
               Join Bloom Tasks
             </p>
             <p>Start cultivating your productivity</p>
