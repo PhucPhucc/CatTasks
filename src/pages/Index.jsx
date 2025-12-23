@@ -5,9 +5,7 @@ import Button from "../components/ui/Button";
 import Wrapper from "../components/Wrapper";
 import TaskStats from "../components/TaskStats";
 import AddTask from "../components/AddTask";
-import TaskItem from "../components/TaskItem";
 import { toast } from "sonner";
-import EmptyTasks from "../components/EmptyTasks";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../store/authStore";
 import { signOut } from "firebase/auth";
@@ -19,10 +17,13 @@ import {
   orderBy,
   where,
 } from "firebase/firestore";
+import TasksList from "../components/TasksList";
 
 const Index = () => {
   const [tasks, setTasks] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(JSON.parse(localStorage.getItem('darkmode')));
+  const [isDarkMode, setIsDarkMode] = useState(
+    JSON.parse(localStorage.getItem("darkmode"))
+  );
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
 
@@ -127,27 +128,7 @@ const Index = () => {
         </section>
 
         <section>
-          <div>
-            <div className="flex justify-between mb-4">
-              <p className="font-display text-foreground font-bold text-xl">
-                Your Tasks
-              </p>
-              {tasks.length > 0 && (
-                <span className="text-sm text-muted-foreground">
-                  {tasks.filter((t) => !t.completed).length} remaining
-                </span>
-              )}
-            </div>
-            {tasks.length === 0 ? (
-              <EmptyTasks />
-            ) : (
-              <ul className="">
-                {tasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
-                ))}
-              </ul>
-            )}
-          </div>
+          <TasksList tasks={tasks} />
         </section>
       </main>
     </Wrapper>
